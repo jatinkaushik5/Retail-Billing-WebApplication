@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import api from '../axiosConfig';
 import { compile } from 'tailwindcss';
 
-const stripePromise = loadStripe(process.env.STRIPE_KEY);
+const stripePromise = loadStripe("pk_test_51T9RFAFXEowWx1FFQ4qS7SMVOQ2ppCjZc6kPubrjQY1zH5xk3dvkJEn0SVN6aSskMK6FQcGzWKaslncBcOlzzNOJ00hpN2YbtP");
 const DisplaySummary = () => {
 
     const {setpaymentMethod,amount}=useContext(AppContext)

@@ -18,6 +18,7 @@ const navigate=useNavigate()
      localStorage.removeItem('showReceipt')
      localStorage.removeItem("payment")
      localStorage.removeItem("orderResponse")
+     localStorage.removeItem("paymentMethod")
      navigate("/explore")
   }
 
