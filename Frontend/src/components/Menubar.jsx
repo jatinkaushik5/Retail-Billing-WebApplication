@@ -56,7 +56,7 @@ const Menubar = () => {
             </nav>
 
           <div className='flex items-center mt-2 h-full  '>
-             <div className='h-full flex relative '>
+             <div className='h-full flex relative z-50 '>
         <img src={Userlogo} alt="" className='h-9 w-9 rounded-full' onClick={()=>setshow(!show)} />
           {show && 
           <div className='absolute right-0 mt-9 w-40 bg-white rounded shadow-lg'>

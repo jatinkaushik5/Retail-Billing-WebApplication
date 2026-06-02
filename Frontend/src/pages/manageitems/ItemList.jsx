@@ -22,7 +22,7 @@ const ItemList = () => {
     }
 
     fetch()
-  },[])
+  },items)
 
 
   async function Deleteitem(id){
@@ -32,7 +32,7 @@ const ItemList = () => {
       setitems(items.filter(item=>item.itemId !==id))
     }
     catch(error){
-      toast.error("Something went wrong bhai")
+      toast.error("Something went wrong ")
     }
   }
 

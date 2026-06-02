@@ -1,74 +1,85 @@
-import React, { useContext, useEffect } from 'react'
-import logo from './assets/logo.png'
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { Routes,Route } from 'react-router-dom'
-import Menubar from './components/Menubar'
-import Dashboard from './pages/dashboard/Dashboard'
-import Explore from './pages/explore/Explore';
-import Manage_items from './pages/manageitems/Manage_items'
-import Manage_Categories from './pages/managecategories/Manage_Categories'
-import Manage_Users from './pages/manangeusers/Manage_users'
+import React from 'react'
+import Login from './Pages/Login'
+import Dashboard from './Pages/DashBoard/Dashboard'
+import View from './Pages/View'
+import { Navigate, Route,Routes, useNavigate } from 'react-router-dom'
+import Users from './Pages/User/Users'
 import { Toaster } from 'react-hot-toast'
-import Login from './pages/Login'
-import DisplayReceipt from   "./pages/display/DisplayReceipt"
-import { AppContext } from './Context/AppContext'
+import Inventory from './Pages/Inventory/Inventory'
+import Billing from './Pages/Billing/Billing'
+import Invoice from './Pages/Billing/Invoice'
+import { jwtDecode } from "jwt-decode";
 
 
 const App = () => {
 
-  const location=useLocation();
   const token=localStorage.getItem("token")
-  const navigation=useNavigate()
-  const {showReceipt,setshowReceipt}=useContext(AppContext)
-  const paymentDone=JSON.parse(localStorage.getItem("payment"))
-  const roles=JSON.stringify(localStorage.getItem("roles"))
-  
+  const roles=localStorage.getItem("roles")
 
-  useEffect(() => {
-    const showres = localStorage.getItem("showReceipt");
-    const ShowReceipt = showres ? JSON.parse(showres) : null;
-    setshowReceipt(ShowReceipt);
-  }, [setshowReceipt]);
+   function isLoggedIN(element){
+    if(token){
+     return  <Navigate to={'/view'}/>
+    }
+    else{
+      return element
+    }
+  }
 
-  
 
- const LoginRoute=({children})=>{
-  return !token ?children: <Navigate to={'/dashboard'}/>
- }
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem("token");
 
- const Routing=({children,role})=>{
-  if(token){
-    if(roles.includes(role)){
+  if (!token) return <Navigate to="/" />;
+
+  try {
+    const decoded = jwtDecode(token);
+
+    // Token expired
+    if (decoded.exp * 1000 < Date.now()) {
+      localStorage.clear();
+      return <Navigate to="/" />;
+    }
+
     return children;
+
+  } catch (error) {
+    // Invalid token
+    localStorage.clear();
+    return <Navigate to="/" />; 
   }
-  else{
-    return <Navigate to={'/dashboard'}/>
-  }
-  }
-  else{
-    return <Navigate to='/loginPage'/>
-  }
- }
+};
 
 
-  
+  const AdminRoute = ({ children }) => {
+  const roles = localStorage.getItem("roles") || "";
+
+  if (!roles.includes("ROLE_ADMIN")) {
+    return <Navigate to="/view" />;
+  }
+
+  return children;
+};
   return (
     <>
-    {location.pathname !=="/loginPage" && <Menubar/>}
-    <Toaster/>
-    <Routes>
-        <Route path='/dashboard' element={<Dashboard/>}/>
-        <Route path='/explore' element={<Explore/>}/>
-        <Route path='/manage_items' element={<Routing role="ROLE_ADMIN"><Manage_items/></Routing>}/>
-        <Route path='/manage_categories' element={<Routing role="ROLE_ADMIN"><Manage_Categories/></Routing>}/>
-        <Route path='/manage_users' element={<Routing role='ROLE_ADMIN'><Manage_Users/></Routing>}/>
-        <Route path='/loginPage' element={<LoginRoute><Login/></LoginRoute>}/>
 
+
+    
+    <div><Toaster/></div>
+
+    {/* <Invoice/> */}
+
+    <Routes>
+      <Route  path={'/'} element={isLoggedIN(<Login/>)}/>
+      <Route path='/view'   element={ <ProtectedRoute><View/></ProtectedRoute>}>
+      <Route index element={<ProtectedRoute><Dashboard/></ProtectedRoute>} />
+      <Route path='dashboard' element={<ProtectedRoute><Dashboard/></ProtectedRoute>} />
+      <Route path='users' element={<ProtectedRoute><AdminRoute><Users/></AdminRoute></ProtectedRoute>} />
+      <Route path='inventory' element={<ProtectedRoute><AdminRoute><Inventory/></AdminRoute></ProtectedRoute>} />
+      <Route path='billing' element={<ProtectedRoute><Billing/></ProtectedRoute>}/>
+      </Route>
+      <Route path='invoice' element={<ProtectedRoute><Invoice/></ProtectedRoute>}/>
+        <Route path="*" element={<Navigate to="/view" replace />} />
     </Routes>
-    {showReceipt &&
-    <div className='h-[93vh] inset-0 fixed w-full border bg-black/70 flex justify-center items-center z-89'> <DisplayReceipt/>
-    </div>
-    }
     </>
   )
 }

@@ -19,6 +19,7 @@ const navigate=useNavigate()
      localStorage.removeItem("payment")
      localStorage.removeItem("orderResponse")
      localStorage.removeItem("paymentMethod")
+     localStorage.removeItem("order")
      navigate("/explore")
   }
 

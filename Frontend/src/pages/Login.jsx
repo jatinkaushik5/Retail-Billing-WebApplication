@@ -1,61 +1,80 @@
 import React, { useState } from 'react'
-import { loginUser } from '../service/CategoryService';
+import { Handshake } from 'lucide-react';
+import Bill from "../assets/Bill.png"
+import { CiLogin } from "react-icons/ci";
+import { login } from '../Service/LoginService';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { Navigate, useNavigate } from 'react-router-dom';
-
 const Login = () => {
 
-    const [email, setemail] = useState("")
-    const[password,setpassword]=useState("")
-    const [loading, setloading] = useState(false)
 
-    const navigate=useNavigate();
+  const [email, setemail] = useState("")
+  const [password, setpassword] = useState("")
+  const navigate=useNavigate()
 
-    async function submitHandler(e){
-        e.preventDefault();
-        const form=new FormData();
-        form.append("email",email)
-        form.append("password",password)
+  async function loginUser(e){
+    e.preventDefault();
+    try{
+      const formdata=new FormData();
+    formdata.append("email",email)
+    formdata.append("password",password)
 
-        try{
-        const response=await loginUser(form)
-
-        const token=response.data
-        console.log("data fetch:")
-        console.log(token)
-
-        localStorage.setItem("token",response.data.token)
-        localStorage.setItem("roles",response.data.roles)
-        localStorage.setItem("username",response.data.username)
-
-        setemail("")
-        setpassword("")
-
-        toast.success("User Verified")
-
-        navigate("/dashboard")
-
-        }
-        catch(error){
-            toast.error("Wrong Credentials!!")
-        }
+    if(email.length==0){
+      toast.error("Enter Your Email")
+      return
     }
+    if(password.length==0){
+      toast.error("Enter Your Password")
+      return 
+    }
+    const response=await login(formdata)
+    localStorage.setItem("roles",response.data.roles)
+    localStorage.setItem("username",response.data.username)
+    localStorage.setItem("token",response.data.token)
+    console.log(response)
+    navigate('/view')
+    }
+    catch(ex){
+      toast.error("Invalid Credential");
+      
+      return
+    }
+  }
+
+
+
 
   return (
-    <main className='h-[99vh] w-full bg-[url("https://imgs.search.brave.com/6BrUSXrEEN9jTRzswW07UW1tEQweBzrspwqBCXLzgaw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90NC5m/dGNkbi5uZXQvanBn/LzAxLzYyLzkxLzM5/LzM2MF9GXzE2Mjkx/Mzk4NV9qZjdxZkw0/UmVreEZxWFlwTXVq/ZWx1YlN5cDB5emtQ/Wi5qcGc")] bg-center bg-no-repeat bg-cover flex justify-center items-center' >
-        <section className='flex flex-col p-8 bg-white w-[25%] rounded-lg shadow-md'>
-            <h1 className='text-center font-bold text-2xl'>Sign in</h1>
-            <p className='text-center text-[13px]'>Sign in to acess your account</p>
-            <form onSubmit={(e)=>submitHandler(e)} className='flex flex-col mt-4 '>
-                <label htmlFor="email" className='text-[13px]'>Email Address</label>
-                <input type="email" placeholder='yournameexample@.com' className='mt-3 border p-1 rounded-md text-[15px] w-full  ' name='email' id='email' onChange={(e)=>setemail(e.target.value)} value={email}/>
-                <label htmlFor="" className='text-[13px] mt-4'>Password</label>
-                <input type="password" className='mt-3 border p-1 rounded-md text-[15px] w-full  ' onChange={(e)=>setpassword(e.target.value)} value={password} />
-                <button type='submit' className='mt-10 bg-black p-1.5 text-white rounded-md cursor-pointer'>{loading?"Loading....":"Sign in"} </button>
-
-            </form>
+    <>
+    <main className='h-screen w-screen flex flex-col justify-between bg-gray-100'>
+      <header className='h-auto w-full   pt-10 flex flex-col  justify-center items-center' >
+        <img src={Bill} alt=""  className='h-15 w-15 '/>
+        <h1 className='text-3xl'>Bill Sathi</h1>
+    </header>
+    <main className=' flex justify-center items-center '>
+        <section className='flex flex-col gap-2 bg-white md:p-8 p-2  rounded-lg shadow-md'>
+          <h1 className='text-2xl font-bold'>Welcome Back</h1>
+          <p className='opacity-50 text-[13px]'> Please enter your work email to access your billing <br /> dashboard and inventory tools </p>
+          <form onSubmit={(e)=>loginUser(e)} className='flex flex-col gap-4 mt-2'>
+            <label htmlFor="">Email</label>
+            <input type="email" name="email" id="email"  className='md:px-8 px-5 py-1 border border-gray-300 rounded-sm focus:outline-none' placeholder='Enter Your Work Email' onChange={(e)=>setemail(e.target.value)} value={email}/>
+            <label htmlFor="">Password</label>
+            <input type="password" name="password" id="password" className='md:px-8 px-5 py-1 border border-gray-300 rounded-sm focus:outline-none' placeholder='Enter Your Password' onChange={(e)=>setpassword(e.target.value)} value={password} />
+            <div className='flex justify-center mt-6'>
+              <button type='submit' className='flex items-center text-center  text-white shadow-md cursor-pointer px-20 py-1.5 bg-[#26819D]'>Login in <CiLogin /></button>
+            </div>
+          </form>
         </section>
     </main>
+
+    <footer className='flex justify-center gap-6 text-[#26819D]'>
+      <p>© 2024 Bill Sathi. All rights reserved.</p>
+      <p>Privacy Policy</p>
+      <p>Terms of Service</p>
+      <p>Help Center</p>
+    </footer>
+    </main>
+    </>
   )
 }
 
