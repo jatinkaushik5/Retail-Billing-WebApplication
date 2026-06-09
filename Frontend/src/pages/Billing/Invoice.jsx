@@ -11,10 +11,8 @@ const Invoice = () => {
 
     const componentRef = useRef()
 
-    const handlePrint = useReactToPrint({
-        contentRef: componentRef,
-        documentTitle: "Invoice",
-    });
+    
+
 
     const navigate = useNavigate()
     const orderres = JSON.parse(localStorage.getItem("orderresponse"))
@@ -29,6 +27,36 @@ const Invoice = () => {
 
     const dateformat = orderres.createdAt;
     const dateObj = new Date(dateformat)
+
+   const handlePrint = async () => {
+    const element = componentRef.current;
+
+    const worker = html2pdf().from(element).set({
+        margin: 0,
+        image: { type: "jpeg", quality: 1 },
+        html2canvas: { scale: 3, useCORS: true },
+        jsPDF: {
+            unit: "mm",
+            format: [80, 150],
+            orientation: "portrait"
+        }
+    });
+
+    const pdfBlob = await worker.outputPdf('blob');
+    const url = URL.createObjectURL(pdfBlob);
+
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = url;
+    document.body.appendChild(iframe);
+
+    iframe.onload = () => {
+        setTimeout(() => {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+        }, 500);
+    };
+};
 
     return (
         <>
@@ -58,136 +86,130 @@ const Invoice = () => {
                 </div>
             </header>
 
-            {/* ── Main ── */}
-            <main className='min-h-screen w-full flex justify-center bg-blue-50 px-3 sm:px-6 py-8'>
-                <section
-                    className='w-full max-w-2xl flex flex-col gap-3'
-                    ref={componentRef}
-                >
-                    {/* ── Block 1: Branding + Invoice Details ── */}
-                    <div className='flex flex-col sm:flex-row justify-between gap-4 bg-white p-5 rounded-md shadow-sm'>
+            <main className='flex flex-col' >
+            <div id='print-area'>
+        <div style={{ backgroundColor: 'white', display: 'flex', justifyContent: 'center', paddingTop: '32px', paddingBottom: '32px' }}>
+  <div
+    ref={componentRef}
+    style={{
+      width: '80mm',
+      border: '1px solid #d1d5db',
+      padding: '16px',
+      fontSize: '12px',
+      color: '#000',
+      fontFamily: 'monospace',
+    }}
+  >
+    {/* Header */}
+    <div style={{ textAlign: 'center' }}>
+      <h1 style={{ fontSize: '20px', fontWeight: 'bold', margin: 0 }}>BILL SATHI</h1>
+    </div>
 
-                        {/* Left: Brand + Bill To */}
-                        <div className='flex flex-col gap-1 sm:w-[45%]'>
-                            <span className='flex items-center gap-1 mb-1'>
-                                <h1 className='text-lg font-bold text-[#00647E]'>Bill Sathi</h1>
-                                <img src={Bill} alt="" className='h-7' />
-                            </span>
-                            <h2 className='text-sm font-semibold text-gray-500 uppercase tracking-wide'>Bill To</h2>
-                            <div className='flex flex-wrap gap-x-2 gap-y-1 mt-1'>
-                                <p className='text-sm text-gray-600'>Customer name:</p>
-                                <p className='text-sm font-bold text-gray-900'>{orderres.customerName}</p>
-                            </div>
-                            <div className='flex flex-wrap gap-x-2 gap-y-1'>
-                                <p className='text-sm text-gray-600'>Phone Number:</p>
-                                <p className='text-sm font-bold text-gray-900'>{orderres.phoneNumber}</p>
-                            </div>
-                        </div>
+    <div style={{ borderTop: '1px dashed black', margin: '12px 0' }} />
 
-                        {/* Right: Invoice Details */}
-                        <div className='flex flex-col bg-[#F3F4F5] rounded-md p-3 sm:w-[48%] gap-2'>
-                            <h2 className='text-sm font-bold text-[#00606E]'>Invoice Details</h2>
-                            <div className='flex flex-col gap-1.5'>
-                                <div className='flex justify-between items-center'>
-                                    <p className='text-sm text-[#3E494B]'>Order Id</p>
-                                    <p className='text-xs text-[#191C1D] font-medium'>{orderres.Orderid}</p>
-                                </div>
-                                <div className='flex justify-between items-center'>
-                                    <p className='text-sm text-[#3E494B]'>Date</p>
-                                    <p className='text-xs text-[#191C1D] font-medium'>{dateObj.toLocaleDateString()}</p>
-                                </div>
-                                <div className='flex justify-between items-center'>
-                                    <p className='text-sm text-[#3E494B]'>Time</p>
-                                    <p className='text-xs text-[#191C1D] font-medium'>{dateObj.toLocaleTimeString()}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    {/* Invoice Info */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span>Invoice No :</span>
+        <span>{orderres.Orderid}</span>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span>Date :</span>
+        <span>{dateObj.toLocaleDateString()}</span>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span>Time :</span>
+        <span>{dateObj.toLocaleTimeString()}</span>
+      </div>
+    </div>
 
-                    {/* ── Block 2: Customer summary + Payment info ── */}
-                    <div className='w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-blue-50 rounded-md px-4 py-3'>
+    <div style={{ borderTop: '1px dashed black', margin: '12px 0' }} />
 
-                        {/* Left: Bill To summary */}
-                        <div className='flex flex-col'>
-                            <h4 className='text-sm font-medium text-[#3E494B]'>Bill To</h4>
-                            <h2 className='font-bold text-base'>Jatin Kaushik</h2>
-                            <p className='text-sm text-gray-500 mt-0.5'>+91 {orderres.phoneNumber}</p>
-                        </div>
+    {/* Customer Info */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span>Customer :</span>
+        <span>{orderres.customerName}</span>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span>Mobile :</span>
+        <span>{orderres.phoneNumber}</span>
+      </div>
+    </div>
 
-                        {/* Right: Payment status + method */}
-                        <div className='flex gap-6 flex-wrap'>
-                            <div className='flex flex-col items-center gap-1'>
-                                <p className='text-xs font-medium text-gray-600'>Payment Status</p>
-                                <div className='bg-green-400 rounded-2xl'>
-                                    <div className='bg-white/60 rounded-2xl'>
-                                        <p className='text-xs flex items-center gap-1 px-3 py-1 rounded-2xl text-green-800 font-bold'>
-                                            <FaRegCircleCheck />
-                                            Paid
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='flex flex-col items-center gap-1'>
-                                <p className='text-xs font-medium text-gray-600'>Payment Method</p>
-                                <div className='bg-blue-400 rounded-2xl'>
-                                    <div className='bg-white/60 rounded-2xl'>
-                                        <p className='text-xs flex items-center gap-1 px-3 py-1 rounded-2xl text-blue-900 font-bold'>
-                                            {orderres.paymentMethod}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <div style={{ borderTop: '1px dashed black', margin: '12px 0' }} />
 
-                    {/* ── Block 3: Items table ── */}
-                    <div className='w-full bg-white rounded-md shadow-sm overflow-x-auto'>
-                        <table className='w-full min-w-[380px]'>
-                            <thead>
-                                <tr className='border-b border-gray-200'>
-                                    <th className='text-sm font-semibold py-3 px-2 text-center'>Item Name</th>
-                                    <th className='text-sm font-semibold py-3 px-2 text-center'>Qty</th>
-                                    <th className='text-sm font-semibold py-3 px-2 text-center'>Price</th>
-                                    <th className='text-sm font-semibold py-3 px-2 text-center'>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {orderres.items.map((o, index) => (
-                                    <tr key={index} className='border-b border-gray-50 last:border-0'>
-                                        <td className='text-center text-sm py-2 px-2'>{o.name}</td>
-                                        <td className='text-center text-sm py-2 px-2'>{o.quantity}</td>
-                                        <td className='text-center text-sm py-2 px-2'>₹{o.price}</td>
-                                        <td className='text-center text-sm py-2 px-2 font-bold text-[#00647E]'>₹{o.quantity * o.price}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+    {/* Items Table */}
+    <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
+      <thead>
+        <tr>
+          <th style={{ paddingBottom: '8px' }}>Item</th>
+          <th style={{ paddingBottom: '8px', textAlign: 'center' }}>Qty</th>
+          <th style={{ paddingBottom: '8px', textAlign: 'right' }}>Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {orderres.items.map((item, index) => (
+          <tr key={index}>
+            <td style={{ padding: '4px 0' }}>{item.name}</td>
+            <td style={{ textAlign: 'center' }}>{item.quantity}</td>
+            <td style={{ textAlign: 'right' }}>₹{item.price}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
 
-                    {/* ── Block 4: Totals ── */}
-                    <div className='flex flex-col items-end pr-2 sm:pr-6 gap-1 pb-6'>
-                        <div className='w-full max-w-[220px] flex flex-col gap-1'>
-                            <div className='flex justify-between'>
-                                <p className='text-[#00647E] text-sm'>Subtotal</p>
-                                <p className='text-[#00647E] text-sm'>₹{orderres.subtotal}</p>
-                            </div>
-                            <div className='flex justify-between'>
-                                <p className='text-[#00647E] text-sm'>Tax</p>
-                                <p className='text-[#00647E] text-sm'>₹{orderres.totaltax}</p>
-                            </div>
-                            <div className='flex justify-between'>
-                                <p className='text-[#00647E] text-sm'>Discount</p>
-                                <p className='text-[#00647E] text-sm'>₹{orderres.totaldiscount}</p>
-                            </div>
-                            <div className='border-t border-gray-400 my-1'></div>
-                            <div className='flex justify-between'>
-                                <p className='text-base font-bold'>Grand Total</p>
-                                <p className='text-sm font-bold text-[#00647E]'>₹{orderres.grandTotal}</p>
-                            </div>
-                        </div>
-                    </div>
+    <div style={{ borderTop: '1px dashed black', margin: '12px 0' }} />
 
-                </section>
+    {/* Subtotals */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span>Subtotal</span>
+        <span>₹{orderres.subtotal}</span>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span>Tax</span>
+        <span>₹{orderres.totaltax}</span>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span>Discount</span>
+        <span>- ₹{orderres.totaldiscount}</span>
+      </div>
+    </div>
+
+    <div style={{ borderTop: '1px solid black', margin: '12px 0' }} />
+
+    {/* Grand Total */}
+    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '14px' }}>
+      <span>GRAND TOTAL</span>
+      <span>₹{orderres.grandTotal.toFixed(2)}</span>
+    </div>
+
+    <div style={{ borderTop: '1px dashed black', margin: '12px 0' }} />
+
+    {/* Payment */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span>Payment</span>
+        <span>{orderres.paymentMethod}</span>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span>Status</span>
+        <span>PAID</span>
+      </div>
+    </div>
+
+    <div style={{ borderTop: '1px dashed black', margin: '12px 0' }} />
+
+    {/* Footer */}
+    <div style={{ textAlign: 'center' }}>
+      <p style={{ fontWeight: '600', margin: '0 0 4px' }}>Thank You For Shopping!</p>
+      <p style={{ margin: 0 }}>Visit Again</p>
+    </div>
+  </div>
+</div>
+            </div>
+                
             </main>
         </>
     )

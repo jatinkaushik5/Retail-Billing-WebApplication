@@ -23,6 +23,7 @@ const stripePromise = loadStripe("pk_test_51T9RFAFXEowWx1FFQ4qS7SMVOQ2ppCjZc6kPu
 const Billing = () => {
     const [cartId, setcartId] = useState(null)
     const navigate=useNavigate()
+    const [loading, setloading] = useState(false)
 
     const[show,setshow]=useState(false)
     const [items, setitems] = useState([])
@@ -178,6 +179,7 @@ function selectCash(){
 }
 
 async function placeOrder(){
+  setloading(true)
   if(name.length<1){
     toast.error("Enter Customer name")
     return 
@@ -221,6 +223,7 @@ async function placeOrder(){
     console.log(e)
    }
    finally{
+    setloading(false)
     await deleteAllCart();
     navigate("/invoice")
    }
@@ -388,7 +391,7 @@ async function placeOrder(){
             <span className='flex flex-col   mt-2'>
                
                 <span className='pl-7'>
-                    <p className='text-[20px] font-medium text-end p-2'>{Subtotal+totaltax-totalDiscount.toFixed(2)}</p>
+                    <p className='text-[20px] font-medium text-end p-2'>{(Subtotal+totaltax-totalDiscount).toFixed(2)}</p>
                     <p className='text-end text-[13px]'>(Tax included)</p>
                 </span>
                  <span className='flex items-center '>
@@ -406,7 +409,7 @@ async function placeOrder(){
             </div>
         </div>
         <div className='flex   justify-center  p-2  w-full bg-[#cadfe63b]   mt-20'>
-                    <button className=' p-4 text-[13px] w-[80%] justify-center mb-2 rounded-2xl bg-[#26819D] text-white flex items-center gap-2' onClick={placeOrder}>Complete Order <FaArrowRight/></button>
+                    <button className=' p-4 text-[13px] w-[80%] justify-center mb-2 rounded-2xl bg-[#26819D] text-white flex items-center gap-2' onClick={placeOrder}>{loading?"Processing....":"Complete Order"} <FaArrowRight/></button>
                 </div>
         </section>
 

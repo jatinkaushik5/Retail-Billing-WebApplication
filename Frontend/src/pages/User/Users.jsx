@@ -199,7 +199,7 @@ const Users = () => {
     <div className='h-17   flex items-center  justify-between  md:px-8 md:py-2  px-2 py-2 md:gap-0 gap-3 bg-white '>
                     <div className=' h-full flex items-center'>
                         <CiSearch  className='bg-[#ECEEF0] md:h-10 h-8 w-7 p-1 rounded-l-md'/>
-                    <input type="text" placeholder='Search team members...' className=' md:h-10 h-8 tracking-wider bg-[#ECEEF0] font-medium md:w-65 w-50 p-2 text-[10px] md:text-[12px] focus:outline-none  font-inter rounded-r-md' onChange={(e)=>findUser(e)} />
+                    <input type="text" placeholder='Search team members...' className=' md:h-10 h-8 tracking-wider bg-[#ECEEF0] font-medium md:w-65 sm:w-50 p-2 text-[10px] md:text-[12px] focus:outline-none  font-inter rounded-r-md' onChange={(e)=>findUser(e)} />
                     </div>
                 <div className='flex h-full mr-10 items-center gap-4'>
                     <span className='flex flex-col'>

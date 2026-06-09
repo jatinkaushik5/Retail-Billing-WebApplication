@@ -41,7 +41,8 @@ const Inventory = () => {
     const [iid, setiid] = useState("")
     const [totalitems, setotalitems] = useState(0)
     const [categorycurrentPage, setcategorycurrentPage] = useState(0)
-    const [totalcategory, settotalcategory] = useState(0)
+    const [totalcategory, settotalcategory] = useState([])
+    const [categorycount, setcategorycount] = useState(0)
 
     const dataperBlock = 5;
 
@@ -49,9 +50,11 @@ const Inventory = () => {
         async function fetch() {
             const response = await getAllCategory(categorycurrentPage);
             const response1=await getAllCategoryName();
-            setcategories(response1.data)
-            settotalcategory(response.data.totalCategory)
-            console.log("data: ",response1.data)
+            settotalcategory(response1.data)
+            setcategories(response.data.data)
+            setcategorycount(response.data.totalCategory)
+           
+       
         }
         fetch()
     }, [categorycurrentPage])
@@ -73,8 +76,9 @@ const Inventory = () => {
         setotalitems(response1.data.totalitems)
         const response = await getAllCategory(categorycurrentPage);
        const response2=await getAllCategoryName();
-        setcategories(response2.data)
-        settotalcategory(response.data.totalCategory)
+         settotalcategory(response2.data)
+            setcategories(response.data.data)
+            setcategorycount(response.data.totalCategory)
     }
 
     async function categorySave(e) {
@@ -91,8 +95,9 @@ const Inventory = () => {
             await saveCategory(data);
             const response = await getAllCategory(categorycurrentPage);
             const response1=await getAllCategoryName();
-            setcategories(response1.data)
-            settotalcategory(response.data.totalCategory)
+             settotalcategory(response1.data)
+            setcategories(response.data.data)
+            setcategorycount(response.data.totalCategory)
             toast.success("Category added Successfully")
         } catch (error) {
             setloading(false)
@@ -136,8 +141,9 @@ const Inventory = () => {
             setotalitems(response1.data.totalitems)
             const response = await getAllCategory(categorycurrentPage);
             const response2=await getAllCategoryName();
-            setcategories(response2.data)
-            settotalcategory(response.data.totalCategory)
+             settotalcategory(response2.data)
+            setcategories(response.data.data)
+            setcategorycount(response.data.totalCategory)
         } catch (err) {
             toast.error("Item Already Present"); return
         }
@@ -161,8 +167,9 @@ const Inventory = () => {
         toast.success("Category deleted");
         const response = await getAllCategory(categorycurrentPage);
        const response1=await getAllCategoryName();
-            setcategories(response1.data)
-        settotalcategory(response.data.totalCategory)
+         settotalcategory(response1.data)
+            setcategories(response.data.data)
+            setcategorycount(response.data.totalCategory)
         const response2 = await getitems(currentPage);
         setitems(response2.data.items)
         setotalitems(response1.data.totalitems)
@@ -178,7 +185,7 @@ const Inventory = () => {
         if (categorycurrentPage > 0) setcategorycurrentPage(categorycurrentPage - 1)
     }
     function MovetoNextCategory() {
-        if (categorycurrentPage < (Math.ceil(totalcategory / dataperBlock) - 1)) setcategorycurrentPage(categorycurrentPage + 1)
+        if (categorycurrentPage < (Math.ceil(categorycount / dataperBlock) - 1)) setcategorycurrentPage(categorycurrentPage + 1)
     }
 
     return (
@@ -278,7 +285,7 @@ const Inventory = () => {
                                     onChange={(e) => seticategory(e.target.value)} value={icategory}
                                 >
                                     <option value="">-- Choose Category --</option>
-                                    {categories.map((c) => (
+                                    {totalcategory.map((c) => (
                                         <option  value={c}>{c}</option>
                                     ))}
                                 </select>
@@ -466,7 +473,7 @@ const Inventory = () => {
                     {/* ── Category List ── */}
                     <div className={`flex flex-col justify-between w-full sm:w-4/5 bg-white rounded-md shadow-md h-80 sm:h-96 lg:h-[55%] p-3 ${view === "category" ? "flex" : "hidden"}`}>
                         <div className='flex flex-col overflow-y-auto flex-1 p-2'>
-                            <p className='text-gray-800 text-sm font-medium mb-2'>View Category ({totalcategory})</p>
+                            <p className='text-gray-800 text-sm font-medium mb-2'>View Category ({categorycount})</p>
                             <table className='border-separate border-spacing-y-3 w-full'>
                                 <tbody>
                                     {categories.map((category) => (

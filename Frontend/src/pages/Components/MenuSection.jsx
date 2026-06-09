@@ -31,7 +31,7 @@ const MenuSection = ({width}) => {
   }
   return (
     <>  
-    <header className={`h-full w-100  md:flex hidden flex-col gap-10 p-4   `}>
+    <header className={`h-full w-100  md:flex hidden flex-col gap-10 p-4    `}>
         <div className='flex  items-center md:justify-start justify-center  h-15'>
             <img src={Bill} alt="" className='h-11' />
             <h1 className='text-[20px] font-bold text-[#00647E] '>BillSathi</h1>
